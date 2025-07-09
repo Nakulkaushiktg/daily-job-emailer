@@ -1,26 +1,22 @@
-name: Send Daily Job Email
+# .github/workflows/send_daily_alert.yml
+name: Send Daily Job Alerts
 
 on:
   schedule:
-    - cron: '0 16 * * *'  # Runs every day at 9:30 PM IST (4:00 PM UTC)
+    - cron: '40 16 * * *'  # Runs every day at 10:10 PM IST (16:40 UTC)
   workflow_dispatch:
 
 jobs:
-  send_email:
+  send_alert:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-
-    - name: Install Dependencies
-      run: pip install --upgrade pip
-
-    - name: Run Email Script
+    - run: pip install requests beautifulsoup4 twilio
+    - run: python daily_job_emailer.py
       env:
         GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-      run: python daily_job_emailer.py
+        TWILIO_SID: ${{ secrets.TWILIO_SID }}
+        TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
