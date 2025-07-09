@@ -5,43 +5,36 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from whatsapp_sender import send_whatsapp
 import os
+import requests
+from bs4 import BeautifulSoup
 
-# Dummy fallback job list for testing
 def scrape_yc_jobs():
-    return [
-        {
-            "title": "Backend Developer",
-            "company": "StartupX",
-            "location": "Remote",
-            "link": "https://startupx.com/job/backend-dev",
-            "summary": "Work on scalable backend systems using Node.js."
-        },
-        {
-            "title": "Junior Backend Engineer",
-            "company": "TechNest",
-            "location": "Remote",
-            "link": "https://technest.com/careers/junior-backend",
-            "summary": "Join a fast-growing team building API infrastructure."
-        }
-    ]
+    url = "https://www.workatastartup.com/jobs?query=backend"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    jobs = []
+    listings = soup.select(".job-preview")
+    for job in listings[:10]:
+        title_tag = job.select_one(".job-title")
+        company_tag = job.select_one(".company-name")
+        link_tag = job.select_one("a")
+        summary_tag = job.select_one(".truncate-lines-2")
+
+        if title_tag and company_tag and link_tag:
+            jobs.append({
+                "title": title_tag.text.strip(),
+                "company": company_tag.text.strip(),
+                "location": "Remote",
+                "link": f"https://www.workatastartup.com{link_tag['href']}",
+                "summary": summary_tag.text.strip() if summary_tag else "No summary"
+            })
+    return jobs
 
 def scrape_angellist_jobs():
-    return [
-        {
-            "title": "Entry-Level Backend Developer",
-            "company": "CodeCraft",
-            "location": "India (Remote)",
-            "link": "https://wellfound.com/job/codecraft-backend",
-            "summary": "Exciting backend opportunity in a product-focused startup."
-        },
-        {
-            "title": "Software Engineer Intern",
-            "company": "LaunchLabs",
-            "location": "Remote",
-            "link": "https://wellfound.com/job/launchlabs-se-intern",
-            "summary": "Internship with a focus on backend services and cloud."
-        }
-    ]
+    # Temporarily return empty list as AngelList blocks scraping
+    return []
 
 def generate_linkedin_message(company, role):
     return (
