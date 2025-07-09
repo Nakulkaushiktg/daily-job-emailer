@@ -8,7 +8,7 @@ def send_whatsapp(message_body):
     client = Client(account_sid, auth_token)
 
     from_whatsapp = "whatsapp:+14155238886"  # Twilio sandbox number
-    to_whatsapp = "whatsapp:+91XXXXXXXXXX"   # Replace with your real WhatsApp number
+    to_whatsapp = "whatsapp:+917082144309"   # Replace with your real WhatsApp number
 
     try:
         message = client.messages.create(
