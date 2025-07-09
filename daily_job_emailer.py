@@ -10,27 +10,35 @@ from bs4 import BeautifulSoup
 
 def scrape_yc_jobs():
     url = "https://www.workatastartup.com/jobs?query=backend"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, "html.parser")
 
     jobs = []
-    listings = soup.select(".job-preview")
+    listings = soup.find_all("li", class_="JobPreview__JobPreviewComponent-sc-17i8mwd-0")
     for job in listings[:10]:
-        title_tag = job.select_one(".job-title")
-        company_tag = job.select_one(".company-name")
-        link_tag = job.select_one("a")
-        summary_tag = job.select_one(".truncate-lines-2")
+        try:
+            title_tag = job.find("h3")
+            company_tag = job.find("p", class_="sc-bdnxRM")
+            link_tag = job.find("a", href=True)
+            summary_tag = job.find("p", class_="sc-1ebt0f7-0")
 
-        if title_tag and company_tag and link_tag:
-            jobs.append({
-                "title": title_tag.text.strip(),
-                "company": company_tag.text.strip(),
-                "location": "Remote",
-                "link": f"https://www.workatastartup.com{link_tag['href']}",
-                "summary": summary_tag.text.strip() if summary_tag else "No summary"
-            })
+            if title_tag and company_tag and link_tag:
+                jobs.append({
+                    "title": title_tag.text.strip(),
+                    "company": company_tag.text.strip(),
+                    "location": "Remote",
+                    "link": "https://www.workatastartup.com" + link_tag['href'],
+                    "summary": summary_tag.text.strip() if summary_tag else "No summary"
+                })
+        except Exception as e:
+            print("Job parse error:", e)
+            continue
+
     return jobs
+
 
 def scrape_angellist_jobs():
     # Temporarily return empty list as AngelList blocks scraping
