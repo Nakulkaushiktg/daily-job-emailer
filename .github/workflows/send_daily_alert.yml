@@ -3,7 +3,7 @@ name: Send Daily Job Alerts
 
 on:
   schedule:
-    - cron: '3 17 * * *'  # Runs every day at 10:33 PM IST (17:03 UTC)
+    - cron: '7 17 * * *'  # Runs every day at 10:33 PM IST (17:03 UTC)
   workflow_dispatch:
 
 jobs:
